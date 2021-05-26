@@ -1,0 +1,37 @@
+#!/bin/bash
+
+#############################################################################
+#
+#   initialization for pgadmin4
+#
+#############################################################################
+
+[ "${CONFIG_DIR:-}" ] || CONFIG_DIR="$(pwd)"
+[ "${WORKSPACE_DIR:-}" ] || WORKSPACE_DIR="$(pwd)/workspace.$(basename "$CONFIG_DIR")"
+
+declare -r config_dir="${CONFIG_DIR:?}/pgadmin4"
+declare -r workspace_dir="${WORKSPACE_DIR:?}/pgadmin4"
+
+# since v4.16: need everything set in workspace_dir set to 5050:5050  internatl uid:gid of pg4admin process
+declare -r PG4_UID=5050
+declare -r PG4_GID=5050
+
+declare isIinitialized="$(basename "${BASH_SOURCE[0]}")"
+isIinitialized="${workspace_dir}/.${isIinitialized%.*}.init"
+if [ ! -f "$isIinitialized" ]; then
+
+    # perform initialization 
+    mkdir -p "$workspace_dir" ||:
+    [ -d "${workspace_dir}/nginx.conf" ] && sudo rm -rf "${workspace_dir}/nginx.conf"
+
+    touch "$isIinitialized"
+fi
+
+[ -e "${workspace_dir}/servers.json" ] && sudo rm -rf "${workspace_dir}/servers.json"
+if [ -e "${config_dir}/servers.json" ]; then
+    sudo cp -r "${config_dir}/servers.json" "${workspace_dir}/" 
+    sudo sed -i 's|${CFG_USER:?}|'"${CFG_USER:?}"'|g' "${workspace_dir}/servers.json" 
+fi
+
+sudo chown "${PG4_UID}:$PG4_GID" -R "$workspace_dir"
+exit 0

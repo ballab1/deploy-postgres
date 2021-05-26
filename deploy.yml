@@ -1,0 +1,27 @@
+completion_msg:
+        - "If this setup includes a web server, please open the following URL in your browser: https://$(hostname -f)"
+ 
+container_os: alpine
+
+environment:
+    __SECRETS_FILE: /home/bobb/.inf/secret.properties
+    LOCATION: home
+
+#skip_wait:
+#    - grafana
+
+thirdparty_versions:
+    METRICBEAT_VERSION: '7.11.1'
+    PGADMIN4_VERSION: '5.3'            # https://hub.docker.com/r/dpage/pgadmin4
+
+
+versions:
+    repo: https://github.com/ballab1/versions
+    dir: ${WORKSPACE_DIR}/.versions
+    commit: 3012e5d11de8b35e485bcd4e7a903e720c75a072
+    branch: dev
+
+default_args:
+    cmd: 'deploy.restart'
+    latest: 'HEAD'
+    container_tag: 'dev'

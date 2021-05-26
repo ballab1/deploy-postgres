@@ -1,0 +1,68 @@
+version: '3.5'
+
+services:
+    pgadmin4:
+        container_name: pgadmin4
+        depends_on:
+            - postgresql
+        environment:
+            DEFAULT_USER: ${CFG_USER:?}
+            PGADMIN_DEFAULT_EMAIL: ${CFG_EMAIL:?}
+            PGADMIN_DEFAULT_PASSWORD: postgresql
+        hostname: pgadmin
+        image: ${DOCKER_REGISTRY:-s2.ubuntu.home:5000/}thirdparty/pgadmin4:${PGADMIN4_VERSION:-5.3}
+        logging:
+            driver: json-file
+            options:
+                max-file: "3"
+                max-size: "10m"
+        networks:
+           - postres-net
+        ports:
+            - "443:443"
+            - "80:80"
+        restart: unless-stopped
+        secrets:
+            - pgadmin4.pwd
+        volumes:
+            - ./pgadmin4/pgadmin:/var/lib/pgadmin
+            - ./pgadmin4/log:/var/log/pgadmin
+            - ./pgadmin4/servers.json:/pgadmin4/servers.json
+ 
+    postgresql:
+        container_name: postgresql
+        environment:
+            POSTGRES_VERSION: ${POSTGRES_VERSION:-13.3}
+            QUANTILE_VERSION: ${QUANTILE_VERSION:-1.1.7}
+            TIMESCALEDB_VERSION: ${TIMESCALEDB_VERSION:-2.2.1} 
+            POSTGRES_USER: ${CFG_USER:?}
+            POSTGRES_PASSWORD_FILE: /run/secrets/postgres.pwd
+        hostname: postgresql
+        image: ${DOCKER_REGISTRY:-s2.ubuntu.home:5000/}${CONTAINER_OS:-alpine}/postgresql/${POSTGRES_VERSION:-13.3}:${CONTAINER_TAG:-fcb0febe8b699fd31b961b4101b69d25880bf45384c8f3e3e323d6e0cf6cc711}
+        logging:
+            driver: json-file
+            options:
+                max-file: "3"
+                max-size: "10m"
+        networks:
+           - postres-net
+        ports:
+            - "5432:5432"
+        restart: unless-stopped
+        secrets:
+            - postgres.pwd
+        volumes:
+            - ./postgresql/postgres-initdb:/docker-entrypoint-initdb.d:ro
+            - ./postgresql/data:/var/lib/postgresql/data:rw
+            - ./postgresql/etc:/etc/postgres:ro
+            - ./postgresql/log:/var/log:rw
+
+networks:
+    postres-net:
+        name: postres-container-net
+
+secrets:
+   pgadmin4.pwd:
+       file: .secrets/secrets/user.pwd
+   postgres.pwd:
+       file: .secrets/secrets/postgres.pwd

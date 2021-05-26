@@ -1,0 +1,64 @@
+#!/bin/bash
+
+#############################################################################
+#
+#   initialization for postgresql
+#
+#############################################################################
+
+[ "${CONFIG_DIR:-}" ] || CONFIG_DIR="$(pwd)"
+[ "${WORKSPACE_DIR:-}" ] || WORKSPACE_DIR="$(pwd)/workspace.$(basename "$CONFIG_DIR")"
+
+declare -r config_dir="${CONFIG_DIR:?}/postgresql"
+declare -r workspace_dir="${WORKSPACE_DIR:?}/postgresql"
+
+
+declare isIinitialized="$(basename "${BASH_SOURCE[0]}")"
+isIinitialized="${workspace_dir}/.${isIinitialized%.*}.init"
+if [ ! -f "$isIinitialized" ]; then
+
+    # perform initialization 
+    mkdir -p "$workspace_dir" ||: 
+
+    declare initdb="${workspace_dir}/postgres-initdb"
+    if [ ! -e "${initdb}/.setup-CTD_data.sql" ]; then
+
+        mkdir -p "${WORKSPACE_DIR}/bin" ||:
+        while read -r f; do
+            cp "$f" "${WORKSPACE_DIR}/bin"/
+            chmod 755 "${WORKSPACE_DIR}/bin/$(basename "$f")"
+        done < <(find "${config_dir}/bin" -type f ! -name '.*')
+
+        mkdir -p "$initdb" ||:
+        while read -r f; do
+            [ "$f" = 'nginx.conf' ] && continue
+            cp "$f" "$initdb"/
+        done < <(find "${config_dir}" -maxdepth 1 -type f)
+
+        chmod 755 "${initdb}"/*.sh
+
+        declare -r psql_dbpass="$(deploy.passwordSecret 'postgresql' 'POSTGRES_PASSWORD' )"
+
+        # determine nconf dbuser
+        declare -r dc_json="$(lib.yamlToJson "${WORKSPACE_DIR}/docker-compose.yml")"
+        declare psql_dbuser=$(jq --compact-output --monochrome-output --raw-output '.services.postgresql.environment.POSTGRES_USER' <<< "$dc_json")
+        psql_dbuser="$(eval echo "$psql_dbuser")"
+
+        if [ "${psql_dbuser:-null}" != 'null' ] && [ "${psql_dbpass:-}" ]; then
+            cat <<-POSTGRES_USER > "${WORKSPACE_DIR}/postgresql/postgres-initdb/01.global_data.sql"
+SET default_transaction_read_only = off;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+ALTER ROLE ${psql_dbuser} WITH SUPERUSER INHERIT CREATEROLE CREATEDB LOGIN REPLICATION NOBYPASSRLS; 
+ALTER USER ${psql_dbuser} WITH PASSWORD '${psql_dbpass}';
+POSTGRES_USER
+        fi
+    fi
+
+
+    touch "$isIinitialized"
+fi
+
+# perform common
+
+exit 0

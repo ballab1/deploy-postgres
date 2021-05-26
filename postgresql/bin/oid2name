@@ -1,0 +1,1 @@
+docker exec postgresql oid2name $@

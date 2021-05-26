@@ -1,0 +1,37 @@
+# Created by .gitignore support plugin (hsz.mobi)
+.idea
+**/*.bak
+**/*.iml
+**/*.json
+**/*.log
+**/*.sav
+**/*.tgz
+**/*.zip
+
+# OSX
+**/.DS_Store
+**/.AppleDouble
+**/.LSOverride
+
+# Linux
+**/*~
+**/.directory
+**/.Trash-*
+
+samples
+log
+logs
+vols*
+**/CRF.properties
+**/CBF.properties
+scanned.paths
+*.loaded
+**/log.txt
+
+config/versions
+versions
+workspace*
+workspace.*
+test.sh
+*gz
+*.tar
