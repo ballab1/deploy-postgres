@@ -34,11 +34,11 @@ services:
         environment:
             POSTGRES_VERSION: ${POSTGRES_VERSION:-13.3}
             QUANTILE_VERSION: ${QUANTILE_VERSION:-1.1.7}
-            TIMESCALEDB_VERSION: ${TIMESCALEDB_VERSION:-2.2.1} 
+            TIMESCALEDB_VERSION: ${TIMESCALEDB_VERSION:-2.3.0} 
             POSTGRES_USER: ${CFG_USER:?}
             POSTGRES_PASSWORD_FILE: /run/secrets/postgres.pwd
         hostname: postgresql
-        image: ${DOCKER_REGISTRY:-s2.ubuntu.home:5000/}${CONTAINER_OS:-alpine}/postgresql/${POSTGRES_VERSION:-13.3}:${CONTAINER_TAG:-fcb0febe8b699fd31b961b4101b69d25880bf45384c8f3e3e323d6e0cf6cc711}
+        image: ${DOCKER_REGISTRY:-s2.ubuntu.home:5000/}${CONTAINER_OS:-alpine}/postgresql/${POSTGRES_VERSION:-13.3}:${CONTAINER_TAG:-fcb13a1d3bed927b96fd23123476394c6a463c36e89792e9f780719259246ddb}
         logging:
             driver: json-file
             options:
