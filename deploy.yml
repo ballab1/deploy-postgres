@@ -12,7 +12,7 @@ environment:
 
 thirdparty_versions:
     METRICBEAT_VERSION: '7.11.1'
-    PGADMIN4_VERSION: '5.3'            # https://hub.docker.com/r/dpage/pgadmin4
+    PGADMIN4_VERSION: '5.4'            # https://hub.docker.com/r/dpage/pgadmin4
 
 
 versions:
