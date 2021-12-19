@@ -10,7 +10,7 @@ services:
             PGADMIN_DEFAULT_EMAIL: ${CFG_EMAIL:?}
             PGADMIN_DEFAULT_PASSWORD: postgresql
         hostname: pgadmin
-        image: ${DOCKER_REGISTRY:-s2.ubuntu.home:5000/}thirdparty/pgadmin4:${PGADMIN4_VERSION:-5.4}
+        image: ${DOCKER_REGISTRY:-s2.ubuntu.home:5000/}thirdparty/pgadmin4:${PGADMIN4_VERSION:-6.3}
         logging:
             driver: json-file
             options:
@@ -32,13 +32,13 @@ services:
     postgresql:
         container_name: postgresql
         environment:
-            POSTGRES_VERSION: ${POSTGRES_VERSION:-13.3}
+            POSTGRES_VERSION: ${POSTGRES_VERSION:-14.1}
             QUANTILE_VERSION: ${QUANTILE_VERSION:-1.1.7}
-            TIMESCALEDB_VERSION: ${TIMESCALEDB_VERSION:-2.3.0} 
+            TIMESCALEDB_VERSION: ${TIMESCALEDB_VERSION:-2.5.1} 
             POSTGRES_USER: ${CFG_USER:?}
             POSTGRES_PASSWORD_FILE: /run/secrets/postgres.pwd
         hostname: postgresql
-        image: ${DOCKER_REGISTRY:-s2.ubuntu.home:5000/}${CONTAINER_OS:-alpine}/postgresql/${POSTGRES_VERSION:-13.3}:${CONTAINER_TAG:-702dbb9494529996b082fb17459074100cd8babd648f467310368c9c6f456e1f}
+        image: ${DOCKER_REGISTRY:-s2.ubuntu.home:5000/}${CONTAINER_OS:-alpine}/postgresql/${POSTGRES_VERSION:-14.1}:${CONTAINER_TAG:-4d9a5f74b9d86097f45f54edb3d39038813a979331f17f909bb712a72d694ba1}
         logging:
             driver: json-file
             options:
